@@ -41,7 +41,6 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     setError(null);
     try {
       await signInWithEmail(email.trim(), password);
-      navigation.replace('App');
     } catch (e: any) {
       setError(firebaseErrorToMessage(e.code));
     } finally {
@@ -54,7 +53,6 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     setError(null);
     try {
       await registerWithEmail(email.trim(), password);
-      navigation.replace('App');
     } catch (e: any) {
       setError(firebaseErrorToMessage(e.code));
     } finally {

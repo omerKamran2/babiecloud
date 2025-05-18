@@ -1,22 +1,36 @@
 // src/providers/AuthProvider.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, User as AuthUser } from 'firebase/auth';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import firestore from '@react-native-firebase/firestore';
 
 interface AuthContextProps {
-  user: User | null;
+  user: AuthUser | null;
+  profile: Record<string, any> | null;
 }
-const AuthContext = createContext<AuthContextProps>({ user: null });
+const AuthContext = createContext<AuthContextProps>({ user: null, profile: null });
 
 interface AuthProviderProps { children: React.ReactNode; }
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [initializing, setInitializing] = useState(true);
+  const [profile, setProfile] = useState<Record<string, any> | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, u => {
+    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, async u => {
       setUser(u);
+      if (u?.email) {
+        try {
+          const q = firestore().collection('users').where('email', '==', u.email).limit(1);
+          const snap = await q.get();
+          setProfile(!snap.empty ? snap.docs[0].data() : null);
+        } catch {
+          setProfile(null);
+        }
+      } else {
+        setProfile(null);
+      }
       if (initializing) setInitializing(false);
     });
     return unsubscribe;
@@ -30,7 +44,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     );
   }
 
-  return <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, profile }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => useContext(AuthContext);

@@ -21,6 +21,11 @@ export const registerWithEmail = (email: string, password: string) =>
 export const sendPasswordReset = (email: string) =>
   firebaseAuth.sendPasswordResetEmail(FIREBASE_AUTH, email);
 
+/**
+ * Sign out the current user
+ */
+export const signOut = () => firebaseAuth.signOut(FIREBASE_AUTH);
+
 export const registerUser = async (email: string, password: string) => {
   const credential = await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
   const { uid } = credential.user;
