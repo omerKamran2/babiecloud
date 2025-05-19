@@ -26,10 +26,29 @@ export const sendPasswordReset = (email: string) =>
  */
 export const signOut = () => firebaseAuth.signOut(FIREBASE_AUTH);
 
-export const registerUser = async (email: string, password: string) => {
+/**
+ * Registers a new user in Auth and writes full profile to Firestore
+ */
+export const registerUser = async (
+  name: string,
+  email: string,
+  password: string,
+  role: 'partner' | 'support',
+  linkedTo?: string
+) => {
   const credential = await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
   const { uid } = credential.user;
-  await saveProfileIfMissing(uid, { email, createdAt: serverTimestamp() });
+  const userRef = doc(FIRESTORE_DB, 'users', uid);
+  await setDoc(userRef, {
+    uid,
+    name,
+    email,
+    role,
+    linkedTo: linkedTo?.trim() || null,
+    profilePhotoUrl: null,
+    notificationsEnabled: true,
+    createdAt: serverTimestamp(),
+  });
   return credential;
 };
 

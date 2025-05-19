@@ -7,18 +7,21 @@ import {
   ActivityIndicator,
   StyleSheet,
   useColorScheme,
+  TouchableOpacity,
 } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { listenToTasks, deleteTask, Task } from '../services/tasks';
 import { useAuth } from '../providers/AuthProvider';
 import { format } from 'date-fns';
+import AddTaskModal from './AddTaskModal';
 
 const TasksScreen: React.FC = () => {
   const scheme = useColorScheme();
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -51,7 +54,9 @@ const TasksScreen: React.FC = () => {
         ]}
       >
         <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.date}>{format(new Date(item.dueDate), 'yyyy-MM-dd')}</Text>
+        <Text style={styles.date}>
+          {format(item.dueDate.toDate(), 'yyyy-MM-dd')}
+        </Text>
       </View>
     </Swipeable>
   );
@@ -65,13 +70,24 @@ const TasksScreen: React.FC = () => {
   }
 
   return (
-    <FlatList
-      data={tasks}
-      keyExtractor={t => t.id}
-      renderItem={renderItem}
-      contentContainerStyle={styles.list}
-      ListEmptyComponent={<Text style={styles.empty}>No tasks found.</Text>}
-    />
+    <View style={{ flex: 1 }}>
+      <FlatList
+        data={tasks}
+        keyExtractor={t => t.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.list}
+        ListEmptyComponent={<Text style={styles.empty}>No tasks found.</Text>}
+      />
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => setShowAddModal(true)}
+        accessibilityRole="button"
+        accessibilityLabel="Add new task"
+      >
+        <Ionicons name="add" size={28} color="#fff" />
+      </TouchableOpacity>
+      <AddTaskModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
+    </View>
   );
 };
 
@@ -97,4 +113,16 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   empty: { textAlign: 'center', marginTop: 32, color: '#666' },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    backgroundColor: 'blue',
+    borderRadius: 28,
+    width: 56,
+    height: 56,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+  },
 });

@@ -41,7 +41,9 @@ const MoodScreen: React.FC = () => {
 
   const renderItem = ({ item }: { item: Mood }) => (
     <View style={[styles.item, { backgroundColor: scheme === 'dark' ? '#333' : '#fff' }]}>  
-      <Text style={[styles.date, { color: scheme === 'dark' ? '#fff' : '#000' }]}>{format(item.timestamp, 'yyyy-MM-dd')}</Text>
+      <Text style={[styles.date, { color: scheme === 'dark' ? '#fff' : '#000' }]}>
+        {item.timestamp ? format(item.timestamp.toDate(), 'yyyy-MM-dd') : ''}
+      </Text>
       <Text style={{ color: scheme === 'dark' ? '#fff' : '#000' }}>Mood: {item.mood}</Text>
       <Text style={{ color: scheme === 'dark' ? '#fff' : '#000' }}>Energy: {item.energy}</Text>
       <Text style={{ color: scheme === 'dark' ? '#fff' : '#000' }}>Hydration: {item.hydration}</Text>

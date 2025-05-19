@@ -20,12 +20,13 @@ import {
 } from '../services/auth';
 
 // Define navigation params for this screen
-type RootStackParamList = {
+type AuthStackParamList = {
   Login: undefined;
-  App: undefined;
+  SignUp: undefined;
+  ForgotPassword: undefined;
 };
 type Props = {
-  navigation: StackNavigationProp<RootStackParamList, 'Login'>;
+  navigation: StackNavigationProp<AuthStackParamList, 'Login'>;
 };
 
 const SPACING = 16;
@@ -122,16 +123,20 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.button, styles.buttonOutline]}
-                onPress={handleRegister}
-                accessibilityLabel="Create Account Button"
+                onPress={() => navigation.navigate('SignUp')}
+                accessibilityRole="button"
+                accessibilityLabel="Go to Sign Up"
               >
                 <Text style={[styles.buttonText, styles.buttonOutlineText]}>
                   Create Account
                 </Text>
-              </TouchableOpacity> 
+              </TouchableOpacity>
             </>
           )}
-          <TouchableOpacity onPress={handlePasswordReset} disabled={loading}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ForgotPassword')}
+            disabled={loading}
+          >
             <Text style={styles.forgotPassword}>Forgot password?</Text>
           </TouchableOpacity>
         </View>

@@ -40,10 +40,10 @@ const AppTabs: React.FC = () => {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Tasks" component={TasksScreen} />
       <Tab.Screen name="Mood" component={MoodScreen} />
+      <Tab.Screen name="Tasks" component={TasksScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
       {/* <Tab.Screen name="Inbox" component={InboxScreen} /> */}
     </Tab.Navigator>
   );

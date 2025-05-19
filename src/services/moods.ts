@@ -12,16 +12,16 @@ import {
 
 export interface Mood {
   id: string;
-  mood: number; // 0-4
-  energy: number; // 0-4
-  hydration: number; // 0-4
+  mood: 'happy' | 'ok' | 'sad' | 'tired' | 'stressed';
+  energy: 0 | 1 | 2 | 3 | 4;
+  hydration: 0 | 1 | 2 | 3 | 4;
   note?: string;
-  timestamp: number; // ms since epoch
+  timestamp: Timestamp;
 }
 export interface MoodInput {
-  mood: number;
-  energy: number;
-  hydration: number;
+  mood: 'happy' | 'ok' | 'sad' | 'tired' | 'stressed';
+  energy: 0 | 1 | 2 | 3 | 4;
+  hydration: 0 | 1 | 2 | 3 | 4;
   note?: string;
 }
 
@@ -42,15 +42,13 @@ export const listenToMoods = (
   return onSnapshot(q, snapshot => {
     const list: Mood[] = snapshot.docs.map(doc => {
       const data = doc.data() as DocumentData;
-      const rawTs = (data.timestamp as Timestamp | null);
-      const ts = rawTs?.toMillis() ?? Date.now();
       return {
         id: doc.id,
-        mood: data.mood,
+        mood: data.mood as 'happy' | 'ok' | 'sad' | 'tired' | 'stressed',
         energy: data.energy,
         hydration: data.hydration,
         note: data.note,
-        timestamp: ts,
+        timestamp: data.timestamp as Timestamp,
       };
     });
     callback(list);

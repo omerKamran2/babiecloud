@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { registerUser, firebaseErrorToMessage } from '../services/auth';
+import { Picker } from '@react-native-picker/picker';
 
 type AuthStackParamList = {
   SignUp: undefined;
@@ -27,8 +28,11 @@ type Props = {
 const SPACING = 16;
 
 const SignUpScreen: React.FC<Props> = ({ navigation }) => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState<'partner' | 'support'>('partner');
+  const [linkedTo, setLinkedTo] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scheme = useColorScheme();
@@ -37,7 +41,13 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
     setLoading(true);
     setError(null);
     try {
-      await registerUser(email.trim(), password);
+      await registerUser(
+        name.trim(),
+        email.trim(),
+        password,
+        role,
+        linkedTo,
+      );
       navigation.replace('Login');
     } catch (e: any) {
       setError(firebaseErrorToMessage(e.code));
@@ -56,6 +66,15 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
           {error && <Text style={styles.errorText}>{error}</Text>}
           <TextInput
             style={styles.input}
+            placeholder="Name"
+            placeholderTextColor={scheme === 'dark' ? '#666' : '#999'}
+            value={name}
+            onChangeText={setName}
+            autoCapitalize="words"
+            accessibilityLabel="Name Input"
+          />
+          <TextInput
+            style={styles.input}
             placeholder="Email"
             placeholderTextColor={scheme === 'dark' ? '#666' : '#999'}
             autoCapitalize="none"
@@ -72,6 +91,27 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
             value={password}
             onChangeText={setPassword}
             accessibilityLabel="Password Input"
+          />
+          <Text style={[styles.label, { color: scheme === 'dark' ? '#fff' : '#000' }]}>Role</Text>
+          <View style={[styles.pickerWrapper, { borderColor: '#ccc', borderWidth: 1, borderRadius: 4 }]}>  
+            <Picker
+              selectedValue={role}
+              onValueChange={(val: 'partner' | 'support') => setRole(val)}
+              mode="dropdown"
+              style={styles.picker}
+            >
+              <Picker.Item label="Partner" value="partner" />
+              <Picker.Item label="Support" value="support" />
+            </Picker>
+          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Partner UID (optional)"
+            placeholderTextColor={scheme === 'dark' ? '#666' : '#999'}
+            value={linkedTo}
+            onChangeText={setLinkedTo}
+            autoCapitalize="none"
+            accessibilityLabel="Partner UID Input"
           />
           {loading ? (
             <ActivityIndicator style={{ marginTop: SPACING }} />
@@ -106,6 +146,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING / 2,
     marginBottom: SPACING,
   },
+  label: { marginBottom: 8, fontWeight: '600' },
+  pickerWrapper: { marginBottom: SPACING },
+  picker: { height: 48, width: '100%' },
   button: {
     paddingVertical: 12,
     borderRadius: 4,

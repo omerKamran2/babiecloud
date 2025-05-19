@@ -24,14 +24,16 @@ interface Props {
 }
 
 const moodOptions = ['😄', '🙂', '😐', '🙁', '😢'];
+// Map slider index to MoodInput union value
+const moodKeys = ['happy','ok','sad','tired','stressed'] as const;
 const energyIcons = ['⚡️', '⚡️', '⚡️', '⚡️', '⚡️'];
 const hydrationIcons = ['💧', '💧', '💧', '💧', '💧'];
 
 const AddMoodModal: React.FC<Props> = ({ visible, onClose }) => {
   const { user } = useAuth();
   const [mood, setMood] = useState<number>(-1);
-  const [energy, setEnergy] = useState<number>(0);
-  const [hydration, setHydration] = useState<number>(0);
+  const [energy, setEnergy] = useState<0 | 1 | 2 | 3 | 4>(0);
+  const [hydration, setHydration] = useState<0 | 1 | 2 | 3 | 4>(0);
   const [note, setNote] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const scheme = useColorScheme();
@@ -39,7 +41,12 @@ const AddMoodModal: React.FC<Props> = ({ visible, onClose }) => {
   const handleSave = async () => {
     if (!user || mood < 0) return;
     setLoading(true);
-    const entry: MoodInput = { mood, energy, hydration, note };
+    const entry: MoodInput = {
+      mood: moodKeys[mood],
+      energy,
+      hydration,
+      note,
+    };
     try {
       await addMood(entry, user.uid);
       onClose();
@@ -74,14 +81,14 @@ const AddMoodModal: React.FC<Props> = ({ visible, onClose }) => {
             <EmojiSlider
               options={energyIcons}
               value={energy}
-              onChange={setEnergy}
+              onChange={(idx: number) => setEnergy(idx as 0 | 1 | 2 | 3 | 4)}
               accessibilityLabel="Energy Slider"
             />
             <Text style={[styles.label, { color: scheme === 'dark' ? '#fff' : '#000' }]}>Hydration</Text>
             <EmojiSlider
               options={hydrationIcons}
               value={hydration}
-              onChange={setHydration}
+              onChange={(idx: number) => setHydration(idx as 0 | 1 | 2 | 3 | 4)}
               accessibilityLabel="Hydration Slider"
             />
             <TextInput

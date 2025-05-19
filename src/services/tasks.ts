@@ -16,9 +16,11 @@ import {
 export interface Task {
   id: string;
   title: string;
-  description?: string;
-  dueDate: string; // YYYY-MM-DD
-  createdAt: Timestamp;
+  description: string;
+  dueDate: Timestamp;
+  isCompleted: boolean;
+  priority: 0 | 1 | 2 | 3;
+  recurring?: 'daily' | 'weekly' | 'monthly';
 }
 
 const tasksCollection = (uid: string) =>
@@ -31,14 +33,15 @@ export const listenToTasks = (
   const q = query(tasksCollection(uid), orderBy('dueDate', 'asc'));
   return onSnapshot(q, snapshot => {
     const results: Task[] = snapshot.docs.map(docSnap => {
-      const data = docSnap.data();
-      const dueTs = data.dueDate as Timestamp;
+      const data = docSnap.data() as any;
       return {
         id: docSnap.id,
         title: data.title,
         description: data.description,
-        dueDate: dueTs.toDate().toISOString().split('T')[0],
-        createdAt: data.createdAt,
+        dueDate: data.dueDate as Timestamp,
+        isCompleted: data.isCompleted ?? false,
+        priority: data.priority ?? 0,
+        recurring: data.recurring,
       };
     });
     callback(results);
