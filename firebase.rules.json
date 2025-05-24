@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow users to read and write their own profile
+    match /users/{userId} {
+      // Allow users to read and write their own document
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Allow users to read other users' profiles if they're linked
+      allow read: if request.auth != null && 
+                   exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+                   (
+                     // Support users can read their linked partners' profiles
+                     (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'support' && 
+                      resource.data.linkedTo == request.auth.uid)
+                     ||
+                     // Partners can read their linked support's profile
+                     (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'partner' && 
+                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.linkedTo == resource.id)
+                   );
+      
+      // Allow access to subcollections (tasks and moods)
+      match /tasks/{taskId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+        // Support users can read their linked partners' tasks
+        allow read: if request.auth != null && 
+                     exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'support' && 
+                     exists(/databases/$(database)/documents/users/$(userId)) &&
+                     get(/databases/$(database)/documents/users/$(userId)).data.linkedTo == request.auth.uid;
+      }
+      
+      match /moods/{moodId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+        // Support users can read their linked partners' moods
+        allow read: if request.auth != null && 
+                     exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'support' && 
+                     exists(/databases/$(database)/documents/users/$(userId)) &&
+                     get(/databases/$(database)/documents/users/$(userId)).data.linkedTo == request.auth.uid;
+      }
+    }
+    
+    // Default deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
