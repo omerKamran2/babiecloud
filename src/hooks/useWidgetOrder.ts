@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type WidgetId = 'tasks' | 'moods';
+export type WidgetId = 'photo' | 'tasks' | 'moods' | 'weather' | 'hydration' | 'quote';
 
 export function useWidgetOrder(uid: string): [WidgetId[], (o: WidgetId[]) => void] {
   const key = `@widgetOrder_${uid}`;

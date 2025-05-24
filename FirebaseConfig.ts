@@ -15,7 +15,7 @@ const firebaseConfig = {
   projectId: "babiecloud-216c2",
   storageBucket: "babiecloud-216c2.firebasestorage.app",
   messagingSenderId: "701839071709",
-  appId: "1:701839071709:web:cd30f0e6bb9fa586a1fe34"
+  appId: "1:701839071709:web:a0ceedf2e4cb1a48a1fe34"
 };
 
 // Initialize Firebase App (avoid re-init)

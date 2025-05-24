@@ -104,14 +104,26 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
               <Picker.Item label="Support" value="support" />
             </Picker>
           </View>
+          
+          {role === 'partner' && (
+            <>
+              <Text style={[styles.label, { color: scheme === 'dark' ? '#fff' : '#000', marginTop: 8 }]}>
+                Link to Support User
+              </Text>
+              <Text style={[styles.helperText, { color: scheme === 'dark' ? '#bbb' : '#666' }]}>
+                Enter the UID of your support person to link your account
+              </Text>
+            </>
+          )}
+          
           <TextInput
             style={styles.input}
-            placeholder="Partner UID (optional)"
+            placeholder={role === 'partner' ? "Support User UID" : "Account Linking ID (optional)"}
             placeholderTextColor={scheme === 'dark' ? '#666' : '#999'}
             value={linkedTo}
             onChangeText={setLinkedTo}
             autoCapitalize="none"
-            accessibilityLabel="Partner UID Input"
+            accessibilityLabel={role === 'partner' ? "Support UID Input" : "Account Linking ID"}
           />
           {loading ? (
             <ActivityIndicator style={{ marginTop: SPACING }} />
@@ -147,6 +159,11 @@ const styles = StyleSheet.create({
     marginBottom: SPACING,
   },
   label: { marginBottom: 8, fontWeight: '600' },
+  helperText: { 
+    fontSize: 12, 
+    marginBottom: 8,
+    marginTop: -4,
+  },
   pickerWrapper: { marginBottom: SPACING },
   picker: { height: 48, width: '100%' },
   button: {
